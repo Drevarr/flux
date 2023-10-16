@@ -1,0 +1,100 @@
+created: 20230206215940000
+creator: Drevarr
+modified: 20230705163518816
+modifier: drevarr
+tags: ChartData
+title: 202302062159_stability_ChartData
+type: text/vnd.tiddlywiki
+
+
+const names = ["Belvyn Brightblade", "Kira Dragonblaze", "Gavann", "Arcanophage Farra", "Demon Sekhmet", "Sigmund Mistwalker", "Zaylen Harker", "Gyppa X", "Xanvias Tsollice", "Tyrisai", "\u00c2 R K", "Veron Blackburn", "Ravioli Fetabringer", "Sygaldry Verdandi", "Bella Sassy", "Koralia Danai", "Johosh The Great"];
+const professions = ["Firebrand", "Dragonhunter", "Firebrand", "Spellbreaker", "Berserker", "Vindicator", "Firebrand", "Herald", "Vindicator", "Firebrand", "Firebrand", "Herald", "Firebrand", "Firebrand", "Firebrand", "Firebrand", "Firebrand"];
+const ProfessionColor = {"Warrior": "#FFD166", "Berserker": "#B39247", "Spellbreaker": "#665429", "Bladesworn": "#19150A", "Guardian": "#72C1D9", "Dragonhunter": "#508798", "Firebrand": "#2E4D57", "Willbender": "#0B1316", "Revenant": "#D16E5A", "Herald": "#924D3F", "Renegade": "#542C24", "Vindicator": "#2A1612", "Engineer": "#D09C59", "Scrapper": "#926D3E", "Holosmith": "#533E24", "Mechanist": "#2A1F12", "Ranger": "#8CDC82", "Druid": "#629A5B", "Soulbeast": "#385834", "Untamed": "#1C2C1A", "Thief": "#C08F95", "Daredevil": "#866468", "Deadeye": "#4D393C", "Specter": "#261D1E", "Elementalist": "#F68A87", "Tempest": "#AC615F", "Weaver": "#623736", "Catalyst": "#311C1B", "Mesmer": "#B679D5", "Chronomancer": "#7F5595", "Mirage": "#493055", "Virtuoso": "#24182B", "Necromancer": "#52A76F", "Reaper": "#39754E", "Scourge": "#21432C", "Harbinger": "#08110B"};
+option = {
+  title: [
+    {text: 'Stability per Second for all Fights Present', left: 'center'},
+    {text: 'Output in seconds across all fights \nupper: Q3 + 1.5 * IQR \nlower: Q1 - 1.5 * IQR', borderColor: '#999', borderWidth: 1, textStyle: {fontSize: 10}, left: '1%', top: '90%'}
+  ],
+dataset: [
+    {
+      // prettier-ignore
+      source: 
+[[0.0, 0.2106, 3.4886, 7.1299, 0.0, 0.4416, 3.0153, 3.1842], [8.228, 3.5802, 4.5504, 2.4346, 0.0, 0.0, 1.9188, 1.1804], [3.63, 2.5272, 0.0, 8.5211, 0.0, 6.992, 1.2923, 2.745], [1.694, 1.8252, 3.337, 4.0866, 0.0, 3.0912, 0.979, 1.2352, 2.4024, 0.0, 3.2732, 0.0, 0.0, 2.7723, 1.1794, 0.0, 0.0], [5.687, 3.159, 3.1853, 3.565, 0.0, 1.9136, 1.0573, 1.5646, 0.6178, 1.927, 1.3443, 0.2174, 0.0, 1.9625, 0.337], [4.961, 9.4068, 2.8061, 2.2607, 0.0, 0.368, 1.2531, 0.2745, 1.2355, 0.4129, 4.8514, 0.0, 0.0, 1.7755, 0.0, 0.0, 0.0], [11.374, 7.0902, 1.7443, 8.695, 3.2384, 5.6782, 0.0], [7.3445, 2.7528, 10.0534, 2.0155, 3.1122, 6.9465, 7.8624, 2.2552, 0.2175], [12.947, 1.4742, 7.5082, 3.9128, 0.0, 5.52, 2.1538, 0.9608, 0.0, 1.3764, 1.8119, 0.0, 0.0, 5.6693, 0.0], [16.577, 6.7392, 12.4378, 0.4348, 2.3338, 5.888], [1.936, 1.1232, 3.7162, 16.4336, 0.0, 7.8752, 4.8167, 1.8117, 1.5101, 2.5808, 5.4359, 0.82, 0.0, 8.7532, 0.7862, 0.0, 0.7395], [22.627, 0.0, 13.5754, 11.9122, 0.0, 12.88, 6.8138, 0.8235], [18.392, 5.0544, 7.8115, 10.9557, 0.0, 8.1696, 2.702, 4.4744, 6.7954, 4.0604, 7.9492], [14.036, 5.616, 12.0586, 17.7378, 0.0, 11.6288, 6.853, 4.941, 6.6581, 4.1292, 7.8908, 2.0649, 1.2597, 3.4577, 1.1794, 0.0, 2.0445], [26.983, 11.3022, 16.4573, 17.7378, 0.2244, 7.8752, 5.7174, 3.9253, 6.1776, 8.0863, 12.5083, 2.391, 3.5939, 7.881, 11.7374, 4.0895, 3.5148], [26.862, 13.2678, 16.0022, 17.0422, 0.2244, 11.2608, 6.4222, 5.243, 10.7765, 9.6692, 14.2034, 2.2823, 2.3712, 8.8777, 9.0418, 2.3755, 1.8531], [31.218, 12.2148, 14.2579, 19.129, 0.2244, 14.352, 6.5789, 4.8861, 9.9528, 7.8455, 11.8069, 3.6951, 2.7417, 8.8466, 4.4928, 3.9993, 3.3234]]
+    },
+    {
+      transform: {
+        type: 'boxplot',
+        config: {
+          itemNameFormatter: function (params) {
+            return names[params.value];
+          }
+        }
+      },
+    },
+    {
+      fromDatasetIndex: 1,
+      fromTransformResult: 1
+    }
+  ],
+  dataZoom: [{id: 'dataZoomX', type: 'slider', xAxisIndex: [0], left: 10, height: 10, filterMode: 'empty', start: 0, end: 100},{id: 'dataZoomY', type: 'slider', yAxisIndex: [0], filterMode: 'empty', start: 0, end: 100}],
+  tooltip: {trigger: 'item'},
+  grid: {left: '20%', right: '10%', bottom: '15%'},
+  yAxis: {type: 'category', boundaryGap: true, nameGap: 30, splitArea: {show: true}, splitLine: {show: true}},
+  xAxis: {type: 'value', name: 'Sec', splitArea: {show: true}},
+  series: [
+    {
+      name: 'boxplot',
+      type: 'boxplot',
+      datasetIndex: 1,
+      tooltip: {trigger: 'item',
+          formatter: function (params) {
+            console.log(params.value);
+            //Low = params.value[1]
+          return `<u><b>${params.value[0]}</b></u>
+    <table>
+      <tr>
+      	<td align="right">&#x2022;</td>
+        <td align="left">Low   :</td>
+        <td style="color:blue;"align="right"><b>${params.value[1].toFixed(2)}</b></td>
+      </tr>
+      <tr>
+      	<td align="right">&#x2022;</td>
+        <td align="left">Q1    :</td>
+        <td style="color:blue;"align="right"><b>${params.value[2].toFixed(2)}</b></td>
+      </tr>
+      <tr>
+      	<td align="right">&#x2022;</td>
+        <td align="left">Q2    :</td>
+        <td style="color:blue;"align="right"><b>${params.value[3].toFixed(2)}</b></td>
+      </tr>
+      <tr>
+      	<td align="right">&#x2022;</td>
+        <td align="left">Q3    :</td>
+        <td style="color:blue;"align="right"><b>${params.value[4].toFixed(2)}</b></td>
+      </tr>
+      <tr>
+      	<td align="right">&#x2022;</td>
+        <td align="left">High  :</td>
+        <td style="color:blue;"align="right"><b>${params.value[5].toFixed(2)}</b></td>
+      </tr>  
+    </table>`;              
+        },    
+        axisPointer: {type: 'shadow'}},      
+      itemStyle: {
+        borderColor: function (seriesIndex) {
+          let myIndex = names.indexOf(seriesIndex.name);
+          return ProfessionColor[professions[myIndex]];
+                },
+        borderWidth: 2
+      },
+      encode:{tooltip: [ 1, 2, 3, 4, 5]},
+      },
+    {
+      name: 'outlier',
+      type: 'scatter',
+      encode: { x: 1, y: 0 },
+      datasetIndex: 2,
+    }
+  ]
+};
+

@@ -1,0 +1,98 @@
+created: 20230722215203000
+creator: Drevarr
+tags: ChartData
+title: 202307222152_aegis_ChartData
+type: text/vnd.tiddlywiki
+
+
+const names = ["Tootsie Pop Rocks", "Dakk Regia", "Drevarr Moonwillow", "Belvyn Brightblade", "Crusader Siolith", "Aronorf Xideliesi", "Sub Train", "Yummy Kiwi", "Sygaldry Verdandi", "Bella Sassy"];
+const professions = ["Scrapper", "Chronomancer", "Scrapper", "Firebrand", "Firebrand", "Firebrand", "Firebrand", "Firebrand", "Firebrand", "Firebrand"];
+const ProfessionColor = {"Warrior": "#FFD166", "Berserker": "#B39247", "Spellbreaker": "#665429", "Bladesworn": "#19150A", "Guardian": "#72C1D9", "Dragonhunter": "#508798", "Firebrand": "#2E4D57", "Willbender": "#0B1316", "Revenant": "#D16E5A", "Herald": "#924D3F", "Renegade": "#542C24", "Vindicator": "#2A1612", "Engineer": "#D09C59", "Scrapper": "#926D3E", "Holosmith": "#533E24", "Mechanist": "#2A1F12", "Ranger": "#8CDC82", "Druid": "#629A5B", "Soulbeast": "#385834", "Untamed": "#1C2C1A", "Thief": "#C08F95", "Daredevil": "#866468", "Deadeye": "#4D393C", "Specter": "#261D1E", "Elementalist": "#F68A87", "Tempest": "#AC615F", "Weaver": "#623736", "Catalyst": "#311C1B", "Mesmer": "#B679D5", "Chronomancer": "#7F5595", "Mirage": "#493055", "Virtuoso": "#24182B", "Necromancer": "#52A76F", "Reaper": "#39754E", "Scourge": "#21432C", "Harbinger": "#08110B"};
+const short_Prof = {"Guardian": "Gdn", "Dragonhunter": "Dgh",	"Firebrand": "Fbd",	"Willbender": "Wbd", "Warrior": "War", "Berserker": "Brs", "Spellbreaker": "Spb", "Bladesworn": "Bds", "Engineer": "Eng", "Scrapper": "Scr", "Holosmith": "Hls", "Mechanist": "Mec", "Ranger": "Rgr", "Druid": "Dru", "Soulbeast": "Slb", "Untamed": "Unt", "Thief": "Thf", "Daredevil": "Dar", "Deadeye": "Ded", "Specter": "Spe", "Elementalist": "Ele", "Tempest": "Tmp", "Weaver": "Wea", "Catalyst": "Cat", "Mesmer": "Mes", "Chronomancer": "Chr", "Mirage": "Mir", "Virtuoso": "Vir", "Necromancer": "Nec", "Reaper": "Rea", "Scourge": "Scg", "Harbinger": "Har", "Revenant": "Rev", "Herald": "Her", "Renegade": "Ren", "Vindicator": "Vin", "Unknown": "Ukn"};
+option = {
+  title: [
+    {text: 'Aegis per Fight for all Fights Present', left: 'center'},
+    {text: 'Output in seconds across all fights \nupper: Q3 + 1.5 * IQR \nlower: Q1 - 1.5 * IQR', borderColor: '#999', borderWidth: 1, textStyle: {fontSize: 10}, left: '1%', top: '90%'}
+  ],
+dataset: [
+    {
+      // prettier-ignore
+      source: 
+[[10.0607, 44.6495, 0.0, 1.6109, 2.2533, 8.1259, 0.0, 63.3312, 1.9608, 0.0, 25.6039, 24.1941, 0.1932, 7.9062, 1.9488, 10.2816, 5.472, 14.8848], [28.901, 24.1988, 12.4845, 9.5515, 0.0, 43.976, 37.4437, 0.0, 6.2895, 71.5582, 15.9572, 22.4112, 22.3807, 37.4976, 21.5916, 24.36], [9.9389, 140.5247, 6.3342, 33.8994, 32.5511, 12.6641, 0.0, 0.0, 59.8933, 0.0912, 21.987, 32.8482, 15.6989, 0.2656, 2.5725, 0.8178, 14.1696, 0.0, 12.096], [16.4268, 286.9335, 0.0, 16.8096, 82.824, 6.9854, 33.0317, 0.5594, 44.4022], [27.5512, 540.9856, 3.0636, 105.4802, 34.2867, 3.2551, 33.3367, 1.9381, 64.4495, 2.5308, 54.1485, 129.6232, 63.3409, 18.9094, 22.295, 13.3284, 42.4656, 28.0554, 19.0176], [34.7374, 650.0134, 47.7673, 24.1773, 53.46, 40.5154, 4.1958, 89.84, 6.7716, 1.8375, 154.3976, 41.902, 49.1935, 34.4201, 23.7858, 26.136, 43.5138, 21.8064], [7.0969, 438.361, 18.0987, 112.2391, 63.1228, 73.7035, 0.0, 3.2567, 64.4495, 11.6964, 7.728, 223.9097, 81.0488, 46.4646, 20.5114, 26.7264, 43.9344, 27.3258, 94.9536], [11.2949, 583.2122, 0.0, 67.5886, 49.329, 97.3685, 0.0, 3.5564, 134.8635, 142.3422, 46.7236, 49.1694, 59.8878, 26.8569, 136.3392, 0.0, 83.3952], [43.5557, 715.9492, 0.0, 132.2355, 133.371, 26.1122, 158.2142, 125.5743, 128.5677, 17.3508, 18.6585, 296.8504, 66.584, 76.5796, 41.4859, 31.3896, 155.304, 48.393, 113.904], [74.7202, 860.1082, 22.5423, 200.0693, 124.8754, 134.4816, 88.4677, 73.3066, 127.7807, 86.2068, 22.7325, 344.0766, 52.9802, 33.3753, 26.9598, 34.104, 75.4272, 29.1954, 32.3568]]
+    },
+    {
+      transform: {
+        type: 'boxplot',
+        config: {
+          itemNameFormatter: function (params) {
+            return names[params.value]+" ("+short_Prof[professions[params.value]]+")";
+          }
+        }
+      },
+    },
+    {
+      fromDatasetIndex: 1,
+      fromTransformResult: 1
+    }
+  ],
+  dataZoom: [{type: 'slider', show: true, yAxisIndex: [0], start: 100, end: 50 },{type: 'inside', yAxisIndex: [0], start: 100, end: 50 },],
+  tooltip: {trigger: 'item'},
+  grid: {left: '25%', right: '10%', bottom: '15%'},
+  yAxis: {type: 'category', boundaryGap: true, nameGap: 30, splitArea: {show: true}, splitLine: {show: true}},
+  xAxis: {type: 'value', name: 'Sec', splitArea: {show: true}},
+  series: [
+    {
+      name: 'boxplot',
+      type: 'boxplot',
+      datasetIndex: 1,
+      tooltip: {trigger: 'item',
+          formatter: function (params) {
+            //console.log(params.value);
+          return `<u><b>${params.value[0]}</b></u>
+    <table>
+      <tr>
+      	<td align="right">&#x2022;</td>
+        <td align="left">Low   :</td>
+        <td style="color:blue;"align="right"><b>${params.value[1].toFixed(2)}</b></td>
+      </tr>
+      <tr>
+      	<td align="right">&#x2022;</td>
+        <td align="left">Q1    :</td>
+        <td style="color:blue;"align="right"><b>${params.value[2].toFixed(2)}</b></td>
+      </tr>
+      <tr>
+      	<td align="right">&#x2022;</td>
+        <td align="left">Q2    :</td>
+        <td style="color:blue;"align="right"><b>${params.value[3].toFixed(2)}</b></td>
+      </tr>
+      <tr>
+      	<td align="right">&#x2022;</td>
+        <td align="left">Q3    :</td>
+        <td style="color:blue;"align="right"><b>${params.value[4].toFixed(2)}</b></td>
+      </tr>
+      <tr>
+      	<td align="right">&#x2022;</td>
+        <td align="left">High  :</td>
+        <td style="color:blue;"align="right"><b>${params.value[5].toFixed(2)}</b></td>
+      </tr>  
+    </table>`;              
+        },    
+        axisPointer: {type: 'shadow'}},      
+      itemStyle: {
+        borderColor: function (seriesIndex) {
+          let myIndex = names.indexOf(seriesIndex.name.split(" (")[0]);
+          return ProfessionColor[professions[myIndex]];
+                },
+        borderWidth: 2
+      },
+      encode:{tooltip: [ 1, 2, 3, 4, 5]},
+      },
+    {
+      name: 'outlier',
+      type: 'scatter',
+      encode: { x: 1, y: 0 },
+      datasetIndex: 2,
+    }
+  ]
+};
+

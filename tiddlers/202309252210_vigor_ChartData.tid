@@ -1,0 +1,98 @@
+created: 20230925221023000
+creator: Drevarr
+tags: ChartData
+title: 202309252210_vigor_ChartData
+type: text/vnd.tiddlywiki
+
+
+const names = ["Malfax Jinn", "Pixie Buttercup", "Air One Com", "Grasszanine", "Klengah", "Crusader Siolith", "Tootsie Pop Rocks", "Newtype Khan", "Arcanophage Farra", "Varen Frostwood", "High Sorcer Baradun", "Tegan Parker", "Drevarr Moonwillow"];
+const professions = ["Firebrand", "Tempest", "Firebrand", "Spellbreaker", "Druid", "Firebrand", "Scrapper", "Spellbreaker", "Spellbreaker", "Tempest", "Tempest", "Tempest", "Scrapper"];
+const ProfessionColor = {"Warrior": "#FFD166", "Berserker": "#B39247", "Spellbreaker": "#665429", "Bladesworn": "#19150A", "Guardian": "#72C1D9", "Dragonhunter": "#508798", "Firebrand": "#2E4D57", "Willbender": "#0B1316", "Revenant": "#D16E5A", "Herald": "#924D3F", "Renegade": "#542C24", "Vindicator": "#2A1612", "Engineer": "#D09C59", "Scrapper": "#926D3E", "Holosmith": "#533E24", "Mechanist": "#2A1F12", "Ranger": "#8CDC82", "Druid": "#629A5B", "Soulbeast": "#385834", "Untamed": "#1C2C1A", "Thief": "#C08F95", "Daredevil": "#866468", "Deadeye": "#4D393C", "Specter": "#261D1E", "Elementalist": "#F68A87", "Tempest": "#AC615F", "Weaver": "#623736", "Catalyst": "#311C1B", "Mesmer": "#B679D5", "Chronomancer": "#7F5595", "Mirage": "#493055", "Virtuoso": "#24182B", "Necromancer": "#52A76F", "Reaper": "#39754E", "Scourge": "#21432C", "Harbinger": "#08110B"};
+const short_Prof = {"Guardian": "Gdn", "Dragonhunter": "Dgh",	"Firebrand": "Fbd",	"Willbender": "Wbd", "Warrior": "War", "Berserker": "Brs", "Spellbreaker": "Spb", "Bladesworn": "Bds", "Engineer": "Eng", "Scrapper": "Scr", "Holosmith": "Hls", "Mechanist": "Mec", "Ranger": "Rgr", "Druid": "Dru", "Soulbeast": "Slb", "Untamed": "Unt", "Thief": "Thf", "Daredevil": "Dar", "Deadeye": "Ded", "Specter": "Spe", "Elementalist": "Ele", "Tempest": "Tmp", "Weaver": "Wea", "Catalyst": "Cat", "Mesmer": "Mes", "Chronomancer": "Chr", "Mirage": "Mir", "Virtuoso": "Vir", "Necromancer": "Nec", "Reaper": "Rea", "Scourge": "Scg", "Harbinger": "Har", "Revenant": "Rev", "Herald": "Her", "Renegade": "Ren", "Vindicator": "Vin", "Unknown": "Ukn"};
+option = {
+  title: [
+    {text: 'Vigor per Fight for all Fights Present', left: 'center'},
+    {text: 'Output in seconds across all fights \nupper: Q3 + 1.5 * IQR \nlower: Q1 - 1.5 * IQR', borderColor: '#999', borderWidth: 1, textStyle: {fontSize: 10}, left: '1%', top: '90%'}
+  ],
+dataset: [
+    {
+      // prettier-ignore
+      source: 
+[[16.0495, 0.0, 0.0, 34.3896, 246.0717, 0.0, 20.7184, 0.0, 0.0], [374.5077], [20.5682, 0.0, 0.0, 0.0, 303.8679, 76.3963, 21.5362, 0.0, 0.0], [0.0, 68.2195, 54.7709, 55.9894, 0.0, 124.9728, 0.0, 84.7661, 0.0, 0.0, 73.0779], [47.1674, 89.3816, 44.0046, 70.1606, 105.3529, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 145.3662, 73.7537, 0.0, 0.0, 0.0], [36.9541, 18.2048, 39.8475, 77.9166, 163.7232, 39.793, 105.3343, 46.9216, 2.574, 81.3068, 162.8802, 40.1201, 97.3218, 0.0, 0.0], [0.0, 113.0468, 31.1242, 45.9333, 46.9439, 96.1584, 145.1816, 166.4158, 20.8602, 41.7105, 124.5395, 193.8216], [85.6498, 212.8977, 93.1707, 95.6561, 269.928, 74.0189, 435.8285, 64.2454, 133.848, 369.5654, 810.6063, 36.5165, 115.7684, 0.0, 0.0], [0.0, 58.0252, 39.9721, 0.0, 65.0826, 273.792, 44.392, 265.3615, 0.0, 91.5525, 266.5194, 1393.5306, 190.4503, 479.4301, 0.0], [0.0, 84.3755, 166.8573, 108.7909, 183.0414, 159.6384, 178.6329, 479.7698, 153.6795, 473.8396, 1314.1338, 241.8016, 186.2835, 50.3287, 28.9116], [385.6972, 230.5935, 121.2523, 352.9635, 176.8608, 384.1333, 444.087, 50.8707, 97.1685, 267.6248, 995.379, 198.3782, 134.942, 49.631, 0.0], [244.7073, 239.9504, 149.0152, 256.7941, 360.2352, 167.2565, 627.4871, 21.0015, 373.4956, 1954.2705, 374.8345, 290.6023, 0.0, 0.0], [31.3373, 232.9202, 189.486, 106.5884, 211.105, 400.9728, 171.6135, 744.508, 54.0493, 259.4475, 429.0103, 2601.1209, 339.2189, 284.4231, 50.2056, 14.9535]]
+    },
+	{
+	  transform: {
+		type: 'boxplot',
+		config: {
+		  itemNameFormatter: function (params) {
+			return names[params.value]+" ("+short_Prof[professions[params.value]]+")";
+		  }
+		}
+	  },
+	},
+	{
+	  fromDatasetIndex: 1,
+	  fromTransformResult: 1
+	}
+  ],
+  dataZoom: [{type: 'slider', show: true, yAxisIndex: [0], start: 100, end: 50 },{type: 'inside', yAxisIndex: [0], start: 100, end: 50 },],
+  tooltip: {trigger: 'item'},
+  grid: {left: '25%', right: '10%', bottom: '15%'},
+  yAxis: {type: 'category', boundaryGap: true, nameGap: 30, splitArea: {show: true}, splitLine: {show: true}},
+  xAxis: {type: 'value', name: 'Sec', splitArea: {show: true}},
+  series: [
+	{
+	  name: 'boxplot',
+	  type: 'boxplot',
+	  datasetIndex: 1,
+	  tooltip: {trigger: 'item',
+		  formatter: function (params) {
+			//console.log(params.value);
+		  return `<u><b>${params.value[0]}</b></u>
+	<table>
+	  <tr>
+	  	<td align="right">&#x2022;</td>
+		<td align="left">Low   :</td>
+		<td style="color:blue;"align="right"><b>${params.value[1].toFixed(2)}</b></td>
+	  </tr>
+	  <tr>
+	  	<td align="right">&#x2022;</td>
+		<td align="left">Q1    :</td>
+		<td style="color:blue;"align="right"><b>${params.value[2].toFixed(2)}</b></td>
+	  </tr>
+	  <tr>
+	  	<td align="right">&#x2022;</td>
+		<td align="left">Q2    :</td>
+		<td style="color:blue;"align="right"><b>${params.value[3].toFixed(2)}</b></td>
+	  </tr>
+	  <tr>
+	  	<td align="right">&#x2022;</td>
+		<td align="left">Q3    :</td>
+		<td style="color:blue;"align="right"><b>${params.value[4].toFixed(2)}</b></td>
+	  </tr>
+	  <tr>
+	  	<td align="right">&#x2022;</td>
+		<td align="left">High  :</td>
+		<td style="color:blue;"align="right"><b>${params.value[5].toFixed(2)}</b></td>
+	  </tr>  
+	</table>`;              
+		},    
+		axisPointer: {type: 'shadow'}},      
+	  itemStyle: {
+		borderColor: function (seriesIndex) {
+		  let myIndex = names.indexOf(seriesIndex.name.split(" (")[0]);
+		  return ProfessionColor[professions[myIndex]];
+				},
+		borderWidth: 2
+	  },
+	  encode:{tooltip: [ 1, 2, 3, 4, 5]},
+	  },
+	{
+	  name: 'outlier',
+	  type: 'scatter',
+	  encode: { x: 1, y: 0 },
+	  datasetIndex: 2,
+	}
+  ]
+};
+

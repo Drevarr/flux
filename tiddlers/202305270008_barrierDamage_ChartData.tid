@@ -1,0 +1,100 @@
+created: 20230527000807000
+creator: Drevarr
+modified: 20230705163531629
+modifier: drevarr
+tags: ChartData
+title: 202305270008_barrierDamage_ChartData
+type: text/vnd.tiddlywiki
+
+
+const names = ["Ryvalia Fazebringer", "Tegan Parker", "Hauzzy", "Bella Sassy", "Panther B Me", "Sofya De Nova", "Blanco Padre Guard", "Miphest\u00f6", "Demon Sekhmet", "Drevarr Moonwillow", "Rozaalyna", "Newtype Khan", "Zaedy Sagemist", "High Sorcer Baradun", "Lucky Leipreach\u00e1n", "Smol Gluvs", "The Fancy Cheese", "Cyclotechnist Farra"];
+const professions = ["Chronomancer", "Tempest", "Berserker", "Firebrand", "Scourge", "Weaver", "Firebrand", "Tempest", "Spellbreaker", "Scrapper", "Scourge", "Spellbreaker", "Vindicator", "Weaver", "Scrapper", "Scourge", "Scrapper", "Scrapper"];
+const ProfessionColor = {"Warrior": "#FFD166", "Berserker": "#B39247", "Spellbreaker": "#665429", "Bladesworn": "#19150A", "Guardian": "#72C1D9", "Dragonhunter": "#508798", "Firebrand": "#2E4D57", "Willbender": "#0B1316", "Revenant": "#D16E5A", "Herald": "#924D3F", "Renegade": "#542C24", "Vindicator": "#2A1612", "Engineer": "#D09C59", "Scrapper": "#926D3E", "Holosmith": "#533E24", "Mechanist": "#2A1F12", "Ranger": "#8CDC82", "Druid": "#629A5B", "Soulbeast": "#385834", "Untamed": "#1C2C1A", "Thief": "#C08F95", "Daredevil": "#866468", "Deadeye": "#4D393C", "Specter": "#261D1E", "Elementalist": "#F68A87", "Tempest": "#AC615F", "Weaver": "#623736", "Catalyst": "#311C1B", "Mesmer": "#B679D5", "Chronomancer": "#7F5595", "Mirage": "#493055", "Virtuoso": "#24182B", "Necromancer": "#52A76F", "Reaper": "#39754E", "Scourge": "#21432C", "Harbinger": "#08110B"};
+option = {
+  title: [
+    {text: 'Barrier Damage per Fight for all Fights Present', left: 'center'},
+    {text: 'Output in seconds across all fights \nupper: Q3 + 1.5 * IQR \nlower: Q1 - 1.5 * IQR', borderColor: '#999', borderWidth: 1, textStyle: {fontSize: 10}, left: '1%', top: '90%'}
+  ],
+dataset: [
+    {
+      // prettier-ignore
+      source: 
+[[2571, 5105, 0, 0, 0, 15709, 1149, 5603, 1149, 0, 0, 6142, 252, 0, 0, 0, 0, 0, 0, 0, 0, 189, 3286, 0, 650, 1244, 0], [10050, 6781, 0, 0, 0, 13280, 532, 4962, 1189, 0, 895, 1149, 0, 0, 0, 0, 464, 0, 0, 0, 0, 2629, 0, 1859, 171, 0], [12471, 3608, 1288, 0, 0, 23892, 0, 5067, 2153, 0, 275], [10723, 3625, 0, 0, 0, 17533, 1106, 5039, 375, 0, 0, 11112, 0, 1915, 0, 0, 0, 0, 0, 0, 0, 285, 760, 0, 0, 0, 1254], [3731, 4772, 0, 0, 0, 29345, 2250, 10634, 1214, 0, 0, 0, 0, 1282, 0, 375, 0, 0, 0, 0, 0, 0, 3136, 0, 2973, 2465, 0], [8266, 5960, 0, 0, 0, 15549, 0, 3278, 232, 0, 275, 3390, 2708, 7471, 0, 3364, 1494, 0, 550, 3521, 0, 1263, 4515, 0, 0, 0, 1173], [14231, 8264, 0, 0, 14982, 297, 273, 1544, 0, 67, 8449, 0, 9935, 0, 585, 440, 0, 1028, 0, 2242, 2581, 0, 0, 188], [12142, 8482, 0, 31519, 94, 2774, 226, 0, 62, 4047, 275, 2024, 0, 5636, 1577, 4958, 0, 0, 849, 3547], [13213, 3762, 0, 0, 0, 24089, 1412, 5581, 3915, 523, 1983, 3091, 610, 5945, 0, 3415, 680, 0, 4704, 0, 0, 6609, 0, 1609], [10595, 8746, 0, 0, 0, 22734, 1719, 11179, 2078, 0, 1641, 10121, 26, 5032, 0, 396, 164, 30, 471, 298, 0, 2609, 3826, 558, 379, 1143, 71], [12415, 12206, 0, 0, 45869, 0, 7606, 2590, 0, 0, 8505, 0, 6434, 0, 0, 0, 0, 0, 0, 287], [12110, 14847, 0, 0, 0, 27731, 2243, 5354, 1578, 0, 0, 11591, 43, 3992, 511, 1525, 0, 250, 0, 0, 1093, 9712, 0, 4311, 353, 223], [12147, 10449, 0, 0, 45913, 2653, 10936, 1766, 69, 3437, 14482, 0, 0], [26151, 21633, 0, 0, 13311, 4547, 3493, 11082, 5563, 7818, 759, 15489, 0, 3451, 0, 0, 2090, 0, 738, 16189, 0, 0, 0], [3398, 2101, 29240, 12858, 6399, 0, 2701, 1722, 0, 42435, 16148, 0, 1856, 17396, 1034], [23670, 12217, 0, 0, 0, 39201, 9149, 14106, 8366, 351, 1424, 9348, 380, 8806, 0, 6269, 1612, 0, 2221, 571, 0, 4215, 14180, 176, 3315], [106513, 12511, 1408, 0, 0, 80278, 0, 20169, 23262, 1848, 2389, 0, 29782, 0, 2203, 4950, 0, 1753, 0, 4737, 20658, 0, 5425, 7147, 3935], [93488, 14650, 0, 0, 100099, 4669, 35624, 21040, 0, 2199, 14103, 41153, 19596, 4909, 0, 6253, 918, 0, 12313, 26630, 2335, 5679, 5578, 10711]]
+    },
+    {
+      transform: {
+        type: 'boxplot',
+        config: {
+          itemNameFormatter: function (params) {
+            return names[params.value];
+          }
+        }
+      },
+    },
+    {
+      fromDatasetIndex: 1,
+      fromTransformResult: 1
+    }
+  ],
+  dataZoom: [{type: 'slider', show: true, yAxisIndex: [0], start: 100, end: 50 },{type: 'inside', yAxisIndex: [0], start: 100, end: 50 },],
+  tooltip: {trigger: 'item'},
+  grid: {left: '20%', right: '10%', bottom: '15%'},
+  yAxis: {type: 'category', boundaryGap: true, nameGap: 30, splitArea: {show: true}, splitLine: {show: true}},
+  xAxis: {type: 'value', name: 'Sec', splitArea: {show: true}},
+  series: [
+    {
+      name: 'boxplot',
+      type: 'boxplot',
+      datasetIndex: 1,
+      tooltip: {trigger: 'item',
+          formatter: function (params) {
+            console.log(params.value);
+            //Low = params.value[1]
+          return `<u><b>${params.value[0]}</b></u>
+    <table>
+      <tr>
+      	<td align="right">&#x2022;</td>
+        <td align="left">Low   :</td>
+        <td style="color:blue;"align="right"><b>${params.value[1].toFixed(2)}</b></td>
+      </tr>
+      <tr>
+      	<td align="right">&#x2022;</td>
+        <td align="left">Q1    :</td>
+        <td style="color:blue;"align="right"><b>${params.value[2].toFixed(2)}</b></td>
+      </tr>
+      <tr>
+      	<td align="right">&#x2022;</td>
+        <td align="left">Q2    :</td>
+        <td style="color:blue;"align="right"><b>${params.value[3].toFixed(2)}</b></td>
+      </tr>
+      <tr>
+      	<td align="right">&#x2022;</td>
+        <td align="left">Q3    :</td>
+        <td style="color:blue;"align="right"><b>${params.value[4].toFixed(2)}</b></td>
+      </tr>
+      <tr>
+      	<td align="right">&#x2022;</td>
+        <td align="left">High  :</td>
+        <td style="color:blue;"align="right"><b>${params.value[5].toFixed(2)}</b></td>
+      </tr>  
+    </table>`;              
+        },    
+        axisPointer: {type: 'shadow'}},      
+      itemStyle: {
+        borderColor: function (seriesIndex) {
+          let myIndex = names.indexOf(seriesIndex.name);
+          return ProfessionColor[professions[myIndex]];
+                },
+        borderWidth: 2
+      },
+      encode:{tooltip: [ 1, 2, 3, 4, 5]},
+      },
+    {
+      name: 'outlier',
+      type: 'scatter',
+      encode: { x: 1, y: 0 },
+      datasetIndex: 2,
+    }
+  ]
+};
+

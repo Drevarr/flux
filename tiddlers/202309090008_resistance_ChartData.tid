@@ -1,0 +1,98 @@
+created: 20230909000818000
+creator: Drevarr
+tags: ChartData
+title: 202309090008_resistance_ChartData
+type: text/vnd.tiddlywiki
+
+
+const names = ["Glorious Gluvs", "Air One Com", "Gestern Yesteryear", "Oo Dads Mad", "K\u00e2 \u00d4tik R\u00e6j", "Sub Train", "Jimbo The Pleb", "Koralia Danai", "Firebrand pl1-2628", "K\u00f4sair", "Xanvias Einzbern", "Tribal S", "Heals For Daddy", "Solus Luxes", "Regis Hawkesburne"];
+const professions = ["Berserker", "Firebrand", "Firebrand", "Berserker", "Berserker", "Firebrand", "Berserker", "Firebrand", "Firebrand", "Spellbreaker", "Berserker", "Druid", "Druid", "Firebrand", "Berserker"];
+const ProfessionColor = {"Warrior": "#FFD166", "Berserker": "#B39247", "Spellbreaker": "#665429", "Bladesworn": "#19150A", "Guardian": "#72C1D9", "Dragonhunter": "#508798", "Firebrand": "#2E4D57", "Willbender": "#0B1316", "Revenant": "#D16E5A", "Herald": "#924D3F", "Renegade": "#542C24", "Vindicator": "#2A1612", "Engineer": "#D09C59", "Scrapper": "#926D3E", "Holosmith": "#533E24", "Mechanist": "#2A1F12", "Ranger": "#8CDC82", "Druid": "#629A5B", "Soulbeast": "#385834", "Untamed": "#1C2C1A", "Thief": "#C08F95", "Daredevil": "#866468", "Deadeye": "#4D393C", "Specter": "#261D1E", "Elementalist": "#F68A87", "Tempest": "#AC615F", "Weaver": "#623736", "Catalyst": "#311C1B", "Mesmer": "#B679D5", "Chronomancer": "#7F5595", "Mirage": "#493055", "Virtuoso": "#24182B", "Necromancer": "#52A76F", "Reaper": "#39754E", "Scourge": "#21432C", "Harbinger": "#08110B"};
+const short_Prof = {"Guardian": "Gdn", "Dragonhunter": "Dgh",	"Firebrand": "Fbd",	"Willbender": "Wbd", "Warrior": "War", "Berserker": "Brs", "Spellbreaker": "Spb", "Bladesworn": "Bds", "Engineer": "Eng", "Scrapper": "Scr", "Holosmith": "Hls", "Mechanist": "Mec", "Ranger": "Rgr", "Druid": "Dru", "Soulbeast": "Slb", "Untamed": "Unt", "Thief": "Thf", "Daredevil": "Dar", "Deadeye": "Ded", "Specter": "Spe", "Elementalist": "Ele", "Tempest": "Tmp", "Weaver": "Wea", "Catalyst": "Cat", "Mesmer": "Mes", "Chronomancer": "Chr", "Mirage": "Mir", "Virtuoso": "Vir", "Necromancer": "Nec", "Reaper": "Rea", "Scourge": "Scg", "Harbinger": "Har", "Revenant": "Rev", "Herald": "Her", "Renegade": "Ren", "Vindicator": "Vin", "Unknown": "Ukn"};
+option = {
+  title: [
+    {text: 'Resistance per Fight for all Fights Present', left: 'center'},
+    {text: 'Output in seconds across all fights \nupper: Q3 + 1.5 * IQR \nlower: Q1 - 1.5 * IQR', borderColor: '#999', borderWidth: 1, textStyle: {fontSize: 10}, left: '1%', top: '90%'}
+  ],
+dataset: [
+    {
+      // prettier-ignore
+      source: 
+[[0.0, 110.5699, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 60.1768], [0.0, 31.7242, 92.389, 13.3096, 12.6067, 16.7588, 12.6154, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 22.1414, 152.1264, 20.4406, 41.6794, 18.6303, 24.4886, 0.0, 0.0, 0.0, 89.004], [0.0, 43.152, 331.7098, 20.758, 49.0118, 55.2955, 163.6286], [0.0, 20.713, 195.5381, 0.0, 66.5069, 61.1653, 49.3483, 0.0, 0.0, 0.0, 0.0, 282.1462], [9.0317, 34.1645, 496.4515, 24.9265, 0.0, 37.5629, 20.7571, 93.131, 36.326, 0.0, 12.2139, 5.602, 107.7417], [21.7421, 70.2336, 227.8186, 15.1929, 4.8157, 73.7107, 82.4328, 296.832, 54.612, 41.449, 8.7084, 0.0], [15.8918, 322.0627, 75.5835, 81.4291, 117.1414, 137.6558, 9.102, 12.2573, 12.2508, 0.0, 217.285], [0.0, 72.6144, 445.248, 21.7948, 143.0477, 83.5387, 119.1038, 35.342, 38.1696, 11.9187, 0.0, 194.9439], [0.0, 88.8038, 559.5283, 0.0, 0.0, 133.9142, 97.7454, 188.8594, 0.0, 0.0, 0.0, 131.5241], [0.0, 30.7123, 474.1891, 36.9665, 39.2352, 124.5425, 314.6419, 0.0, 58.5446, 66.6783, 35.4089, 104.4986], [0.0, 20.3558, 429.6643, 27.0425, 0.0, 82.0723, 54.1896, 289.7822, 0.0, 30.5357, 55.5345, 35.2685, 265.2102], [0.0, 24.9389, 470.4787, 21.2023, 0.0, 153.4675, 154.1468, 483.4651], [24.0508, 42.4973, 556.931, 73.9542, 0.0, 170.7053, 119.098, 271.6013, 0.0, 0.0, 24.5016, 0.0, 180.5303], [0.0, 32.7955, 439.3114, 0.0, 0.0, 106.3853, 99.1065, 266.7778, 0.0, 80.2637, 41.4018, 0.0, 471.6851]]
+    },
+	{
+	  transform: {
+		type: 'boxplot',
+		config: {
+		  itemNameFormatter: function (params) {
+			return names[params.value]+" ("+short_Prof[professions[params.value]]+")";
+		  }
+		}
+	  },
+	},
+	{
+	  fromDatasetIndex: 1,
+	  fromTransformResult: 1
+	}
+  ],
+  dataZoom: [{type: 'slider', show: true, yAxisIndex: [0], start: 100, end: 50 },{type: 'inside', yAxisIndex: [0], start: 100, end: 50 },],
+  tooltip: {trigger: 'item'},
+  grid: {left: '25%', right: '10%', bottom: '15%'},
+  yAxis: {type: 'category', boundaryGap: true, nameGap: 30, splitArea: {show: true}, splitLine: {show: true}},
+  xAxis: {type: 'value', name: 'Sec', splitArea: {show: true}},
+  series: [
+	{
+	  name: 'boxplot',
+	  type: 'boxplot',
+	  datasetIndex: 1,
+	  tooltip: {trigger: 'item',
+		  formatter: function (params) {
+			//console.log(params.value);
+		  return `<u><b>${params.value[0]}</b></u>
+	<table>
+	  <tr>
+	  	<td align="right">&#x2022;</td>
+		<td align="left">Low   :</td>
+		<td style="color:blue;"align="right"><b>${params.value[1].toFixed(2)}</b></td>
+	  </tr>
+	  <tr>
+	  	<td align="right">&#x2022;</td>
+		<td align="left">Q1    :</td>
+		<td style="color:blue;"align="right"><b>${params.value[2].toFixed(2)}</b></td>
+	  </tr>
+	  <tr>
+	  	<td align="right">&#x2022;</td>
+		<td align="left">Q2    :</td>
+		<td style="color:blue;"align="right"><b>${params.value[3].toFixed(2)}</b></td>
+	  </tr>
+	  <tr>
+	  	<td align="right">&#x2022;</td>
+		<td align="left">Q3    :</td>
+		<td style="color:blue;"align="right"><b>${params.value[4].toFixed(2)}</b></td>
+	  </tr>
+	  <tr>
+	  	<td align="right">&#x2022;</td>
+		<td align="left">High  :</td>
+		<td style="color:blue;"align="right"><b>${params.value[5].toFixed(2)}</b></td>
+	  </tr>  
+	</table>`;              
+		},    
+		axisPointer: {type: 'shadow'}},      
+	  itemStyle: {
+		borderColor: function (seriesIndex) {
+		  let myIndex = names.indexOf(seriesIndex.name.split(" (")[0]);
+		  return ProfessionColor[professions[myIndex]];
+				},
+		borderWidth: 2
+	  },
+	  encode:{tooltip: [ 1, 2, 3, 4, 5]},
+	  },
+	{
+	  name: 'outlier',
+	  type: 'scatter',
+	  encode: { x: 1, y: 0 },
+	  datasetIndex: 2,
+	}
+  ]
+};
+

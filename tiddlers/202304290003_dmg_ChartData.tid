@@ -1,0 +1,100 @@
+created: 20230429000309000
+creator: Drevarr
+modified: 20230705163527176
+modifier: drevarr
+tags: ChartData
+title: 202304290003_dmg_ChartData
+type: text/vnd.tiddlywiki
+
+
+const names = ["Saramancer", "Ark Darkness", "Khailerian", "Spreadflamesoflight", "Kisarag", "Zadie Miststep", "Brewery Tour", "Sub Train", "Rudjulin", "Hyde En Sikh", "Granfel", "Viral Marketing", "High Sorcer Baradun", "Decara Morningfrost", "Tegan Parker", "Air One Com", "Tika Rucola", "Cat Wigglebooty", "Sister Elon\u00edth", "Venomina The Siren", "Badd Sain", "Da Omichli", "Koralia Danai", "Jr Baldassari", "Primal Clone", "Arriasa", "Killer Beard", "Macstar", "Aronorf Xideliesi", "Bella Sassy", "Mistaeva", "Drevarr Moonwillow", "Miphest\u00f6", "Rhongobojango", "Johosh The Great", "Puny Tinker", "Blancooo Padreee", "Oo Dads Mad", "X Devastation X", "Demon Sekhmet", "Endless Endings", "Kos\u00e4ir", "Newtype Khan", "Smol Gluvs", "Maaaathexxs", "Koisx", "Redoxone", "Rudjulin", "Rina Of Theros", "Lord Erin The Wise", "Kos\u00e4ir", "Morv\u00e4rth", "Panther B Me", "Xyntharos", "Permanent Dawn", "Jupi Jupi Jupi", "Be\u00eb", "Cyclotechnist Farra", "Xanvias Tsoli", "Mistwalker Caelon"];
+const professions = ["Reaper", "Firebrand", "Vindicator", "Dragonhunter", "Deadeye", "Tempest", "Vindicator", "Firebrand", "Firebrand", "Chronomancer", "Engineer", "Firebrand", "Tempest", "Ranger", "Tempest", "Firebrand", "Chronomancer", "Scrapper", "Firebrand", "Tempest", "Willbender", "Renegade", "Firebrand", "Herald", "Chronomancer", "Druid", "Ranger", "Tempest", "Firebrand", "Firebrand", "Herald", "Scrapper", "Tempest", "Tempest", "Firebrand", "Scrapper", "Spellbreaker", "Spellbreaker", "Reaper", "Spellbreaker", "Spellbreaker", "Herald", "Spellbreaker", "Scourge", "Scourge", "Dragonhunter", "Soulbeast", "Willbender", "Scourge", "Weaver", "Vindicator", "Reaper", "Scourge", "Vindicator", "Weaver", "Dragonhunter", "Scourge", "Scrapper", "Holosmith", "Vindicator"];
+const ProfessionColor = {"Warrior": "#FFD166", "Berserker": "#B39247", "Spellbreaker": "#665429", "Bladesworn": "#19150A", "Guardian": "#72C1D9", "Dragonhunter": "#508798", "Firebrand": "#2E4D57", "Willbender": "#0B1316", "Revenant": "#D16E5A", "Herald": "#924D3F", "Renegade": "#542C24", "Vindicator": "#2A1612", "Engineer": "#D09C59", "Scrapper": "#926D3E", "Holosmith": "#533E24", "Mechanist": "#2A1F12", "Ranger": "#8CDC82", "Druid": "#629A5B", "Soulbeast": "#385834", "Untamed": "#1C2C1A", "Thief": "#C08F95", "Daredevil": "#866468", "Deadeye": "#4D393C", "Specter": "#261D1E", "Elementalist": "#F68A87", "Tempest": "#AC615F", "Weaver": "#623736", "Catalyst": "#311C1B", "Mesmer": "#B679D5", "Chronomancer": "#7F5595", "Mirage": "#493055", "Virtuoso": "#24182B", "Necromancer": "#52A76F", "Reaper": "#39754E", "Scourge": "#21432C", "Harbinger": "#08110B"};
+option = {
+  title: [
+    {text: 'Damage per Second for all Fights Present', left: 'center'},
+    {text: 'Output in seconds across all fights \nupper: Q3 + 1.5 * IQR \nlower: Q1 - 1.5 * IQR', borderColor: '#999', borderWidth: 1, textStyle: {fontSize: 10}, left: '1%', top: '90%'}
+  ],
+dataset: [
+    {
+      // prettier-ignore
+      source: 
+[[0.0], [0.0, 1.7513], [6.6461, 0.0, 48.1268, 0.0, 7.0035, 13.8394, 11.6337, 11.0704, 0.0294, 0.0, 53.169, 7.5949, 0.0, 3.1734], [227.7215, 52.6212], [33.8435], [11.8596, 43.8187, 64.5634, 0.0, 16.4483, 6.4453, 7.4257, 14.4225, 0.0, 0.0, 2.662, 3.7722, 0.0076, 10.206], [49.8631], [140.0281, 27.8601, 120.0845], [67.3351], [4.6798, 26.9637, 0.0, 0.0, 17.7968, 8.0803, 64.7921, 62.9014, 22.7843, 0.0, 39.2113, 42.8481, 12.2273, 12.9557], [87.7745, 0.0, 105.5352, 40.7468, 123.8864, 25.3338], [86.1268, 69.9842, 18.073, 26.2178, 43.4718, 0.0, 0.0, 56.8028, 0.0, 0.0], [115.8483, 60.1917, 225.0704, 9.338, 110.0891, 0.0], [174.7468, 257.6515, 22.4928], [24.2191, 106.6995, 8.0141, 20.9054, 1.4818, 35.505, 46.7465, 50.6569, 0.0, 53.9718, 3.7727, 13.1695], [51.4045, 32.3938, 0.0, 30.31, 3.1168, 36.1287, 46.7958, 0.0, 0.0, 70.5634, 6.1899, 0.0, 30.0143], [40.8989, 75.9016, 24.0423, 0.0, 13.9877, 30.146, 35.2871, 39.9648, 0.0, 0.0, 36.8451, 25.2278, 40.9318, 33.2842], [34.2079, 44.2746, 148.5493, 50.1436, 13.3139, 14.6238, 89.7958, 74.951, 0.0, 16.6197, 39.9494, 5.3864, 0.7744], [28.1629, 22.8446, 49.6056, 0.0, 98.5306, 14.2628, 53.9604, 44.0845, 14.2059, 0.0, 12.5775], [39.809, 55.4974, 155.2817, 0.0, 19.6252, 9.708, 25.7525, 95.5141, 50.9314, 0.0, 172.6197, 33.481, 0.0227, 17.3429], [0.711, 69.3358, 29.2178, 142.4155, 52.2059, 0.0, 296.5915, 42.5696, 16.6667, 34.2112], [1274.4648, 0.0, 35.6007], [25.7247, 16.6788, 118.9577, 102.4781, 3.4891, 33.5248, 25.6549, 0.0, 0.0, 51.3099, 7.6329, 0.0, 32.7106], [59.9494, 65.0622, 386.6338, 0.0, 395.0511, 80.7129, 0.0], [94.3483, 94.5492, 131.1831, 23.1996, 24.9051, 38.1683, 73.838, 66.4314, 0.0, 44.831, 78.443, 3.2424, 31.3181], [71.7303, 41.2798, 9.0, 40.3327, 45.3942, 9.4653, 85.1901, 6.6667, 0.0, 26.0845, 9.3544, 8.6742, 87.2751], [0.0, 601.0876, 32.099, 338.2324, 0.0, 7.7911, 101.6761, 59.038, 70.3712], [217.0313], [242.3933, 5.2124, 212.2113, 0.0, 56.063, 70.3504, 198.1782, 95.6127, 67.1275, 10.538, 63.6479, 31.7089, 33.4091, 38.3168], [40.236, 47.5699, 22.2394, 0.0, 79.7093, 2.8978, 3.5941, 68.493, 0.0, 0.0, 72.0, 30.2152, 2.0909, 138.987], [345.9343, 79.1782, 579.6127, 282.5196, 0.0, 215.1646, 124.0606], [86.5169, 114.8705, 190.338, 0.0, 91.7688, 47.1022, 81.9208, 92.9507, 19.7647, 5.481, 106.4366, 52.9494, 8.7121, 71.837], [185.4831, 257.4041, 266.7746, 65.2399, 61.1825, 118.0495, 168.2746, 0.0, 0.0, 100.0704, 43.7342, 2.5833, 35.7797], [114.9213, 454.6269, 341.0, 244.0158], [183.8034, 147.5078, 172.4366, 0.0536, 124.1384, 18.1241, 45.3861, 48.838, 14.0, 0.0, 0.1268, 5.0759, 3.5379, 155.1864], [387.0365], [131.9607, 135.6218, 100.338, 0.0, 196.6287, 49.6423, 43.0198, 206.4718, 68.5196, 0.0, 48.4507, 150.6203, 15.2727, 119.9205], [443.9775, 373.2383, 1072.5211, 0.0, 223.6953, 250.2117], [194.2574, 827.0775, 0.0, 964.6479, 189.519, 35.0455, 252.2373], [384.9775, 361.1762, 305.7887, 0.0, 172.7863, 164.8832, 181.9901, 282.3169, 40.098, 0.0, 0.0, 7.6709, 14.4091, 154.4759], [329.8546, 155.6496, 116.3663, 488.7465, 0.0, 0.0, 349.8592, 138.3418, 30.3864, 222.5919], [592.4799, 333.6861, 124.0792, 1015.8099, 0.0, 0.0, 0.0, 36.1392, 0.0], [320.1236, 354.2953, 611.6761, 0.0, 279.5762, 78.4453, 91.505, 212.5563, 155.1078, 0.0, 184.2394, 252.0886, 102.3788, 145.3207], [470.6685, 368.342, 1270.2394, 0.0, 105.1086, 105.5182, 115.4257, 233.3239, 39.2451, 0.0, 195.338, 157.5443, 30.4697, 212.9948], [455.1854, 89.5285, 1158.7887, 0.0, 199.6865, 411.4526, 283.8317, 1283.0, 7.8797, 530.0282, 200.3671, 239.75], [264.9157, 663.9896, 2031.6197, 0.0, 198.6322, 0.0, 74.8258, 303.0978], [753.338, 346.8036, 248.8809, 313.2993, 279.2772, 1151.5704, 69.3333, 7.8354, 383.1268, 179.2911, 101.5985, 282.4302], [687.5506, 293.0933, 1502.4789, 0.0, 222.4396, 484.5766, 408.3465, 1140.8873, 211.3529, 7.3924, 649.4085, 319.8101, 178.6288], [544.5112, 819.3523, 1369.9577, 60.9107, 336.5919, 289.4088, 476.0297, 863.5563, 114.4118, 21.2025, 513.2254, 262.0506, 35.9015, 247.4329], [796.6629, 645.4093, 3053.507, 385.3929, 499.9194, 670.6204, 316.2574, 803.0704, 70.6373, 0.0], [1561.1124, 1367.6477, 1816.3521, 549.4993], [603.4888, 913.0415, 2352.4366, 264.7679, 691.9702, 255.3431, 962.7921, 755.2535, 731.2843, 0.0], [580.7079, 895.9378, 1856.3803, 105.7143, 797.6795, 294.781, 769.7129, 873.2958, 78.451, 0.0, 148.338, 296.5823, 49.7348, 370.9726], [1163.7528, 1095.6373, 2303.7606, 40.8929, 405.5061, 498.8467, 538.4752, 726.6972, 0.0, 0.0, 716.3521, 131.5823, 8.6591, 578.7771], [672.3764, 1005.6891, 2144.2394, 1566.2154, 747.1241, 312.7129, 0.0, 0.0, 352.9544], [1200.9045, 1311.1192, 3543.4366, 0.0, 704.1909, 818.7007, 1142.0845, 120.5784, 0.0, 515.1408, 162.519, 86.5833, 663.043], [1009.8483, 909.1813, 2877.8873, 58.4464, 928.0525, 373.0, 905.6436, 853.0423, 413.4118, 68.7089, 855.6197, 239.6076, 105.447, 757.0326], [956.0112, 1344.5285, 2542.3944, 190.1429, 553.7583, 438.2993, 838.703, 1021.1127, 425.6765, 0.0, 931.7465, 0.0, 64.4394, 1258.0535], [1705.809, 2064.9577, 1013.0701, 415.1095, 924.1287, 1575.2746, 0.0, 0.0, 1296.2535, 665.6835, 537.0758, 1050.2634], [1816.2528, 1750.6062, 2774.4225, 0.0, 1078.3187, 931.0949, 719.1881, 1592.5211, 317.3725, 130.1076, 163.7042, 64.4684, 74.3864, 1340.6506]]
+    },
+    {
+      transform: {
+        type: 'boxplot',
+        config: {
+          itemNameFormatter: function (params) {
+            return names[params.value];
+          }
+        }
+      },
+    },
+    {
+      fromDatasetIndex: 1,
+      fromTransformResult: 1
+    }
+  ],
+  dataZoom: [{type: 'slider', show: true, yAxisIndex: [0], start: 100, end: 50 },{type: 'inside', yAxisIndex: [0], start: 100, end: 50 },],
+  tooltip: {trigger: 'item'},
+  grid: {left: '20%', right: '10%', bottom: '15%'},
+  yAxis: {type: 'category', boundaryGap: true, nameGap: 30, splitArea: {show: true}, splitLine: {show: true}},
+  xAxis: {type: 'value', name: 'Sec', splitArea: {show: true}},
+  series: [
+    {
+      name: 'boxplot',
+      type: 'boxplot',
+      datasetIndex: 1,
+      tooltip: {trigger: 'item',
+          formatter: function (params) {
+            console.log(params.value);
+            //Low = params.value[1]
+          return `<u><b>${params.value[0]}</b></u>
+    <table>
+      <tr>
+      	<td align="right">&#x2022;</td>
+        <td align="left">Low   :</td>
+        <td style="color:blue;"align="right"><b>${params.value[1].toFixed(2)}</b></td>
+      </tr>
+      <tr>
+      	<td align="right">&#x2022;</td>
+        <td align="left">Q1    :</td>
+        <td style="color:blue;"align="right"><b>${params.value[2].toFixed(2)}</b></td>
+      </tr>
+      <tr>
+      	<td align="right">&#x2022;</td>
+        <td align="left">Q2    :</td>
+        <td style="color:blue;"align="right"><b>${params.value[3].toFixed(2)}</b></td>
+      </tr>
+      <tr>
+      	<td align="right">&#x2022;</td>
+        <td align="left">Q3    :</td>
+        <td style="color:blue;"align="right"><b>${params.value[4].toFixed(2)}</b></td>
+      </tr>
+      <tr>
+      	<td align="right">&#x2022;</td>
+        <td align="left">High  :</td>
+        <td style="color:blue;"align="right"><b>${params.value[5].toFixed(2)}</b></td>
+      </tr>  
+    </table>`;              
+        },    
+        axisPointer: {type: 'shadow'}},      
+      itemStyle: {
+        borderColor: function (seriesIndex) {
+          let myIndex = names.indexOf(seriesIndex.name);
+          return ProfessionColor[professions[myIndex]];
+                },
+        borderWidth: 2
+      },
+      encode:{tooltip: [ 1, 2, 3, 4, 5]},
+      },
+    {
+      name: 'outlier',
+      type: 'scatter',
+      encode: { x: 1, y: 0 },
+      datasetIndex: 2,
+    }
+  ]
+};
+

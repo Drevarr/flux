@@ -1,0 +1,98 @@
+created: 20230823221146000
+creator: Drevarr
+tags: ChartData
+title: 202308232211_cleansesIn_ChartData
+type: text/vnd.tiddlywiki
+
+
+const names = ["Morton Saltbringer", "Vee Usagi", "Be\u00eb", "Arriasa", "Crusader Siolith", "Luke The Ghastly", "Legacy Of Mathus", "Necrotic Windrunner", "Govinda Ektar", "Sub Train", "Kosa\u00efr", "Klengah", "Sub Train", "Lord Erin The Wise", "Rina Of Theros", "Zaylen Harker", "My Birthday Girl", "Daphne Agla\u00e9", "Tootsie Pop Rocks", "Venomina The Sly", "Xanvias Tsolice", "Glorious Gluvs", "Rafaellagabriela", "Mistwalker Cael", "Vee Usagi", "\u00c1rk\u00e1ntor", "Yummy Kiwi", "Solus Luxes", "Mike The Archmagus", "Charr Surethang", "Elonith Requiem", "Koralia Danai", "Sygaldry Verdandi", "Rozaalyna", "Tribal S", "Jimbo The Pleb", "Rahani Sunray", "Be\u00eb", "Newtype Khan", "Tegan Parker", "Bella Sassy", "Darks Na", "Zaedy Zae", "Drevarr Moonwillow", "Eibh\u00ebar", "Arcanophage Farra", "Nose Llama", "Alarics Bane"];
+const professions = ["Chronomancer", "Scourge", "Scourge", "Druid", "Firebrand", "Scourge", "Berserker", "Reaper", "Vindicator", "Firebrand", "Weaver", "Druid", "Dragonhunter", "Weaver", "Scourge", "Firebrand", "Scrapper", "Scourge", "Scrapper", "Druid", "Weaver", "Berserker", "Firebrand", "Herald", "Reaper", "Reaper", "Firebrand", "Firebrand", "Weaver", "Berserker", "Reaper", "Firebrand", "Firebrand", "Reaper", "Druid", "Berserker", "Chronomancer", "Reaper", "Spellbreaker", "Tempest", "Firebrand", "Firebrand", "Druid", "Scrapper", "Chronomancer", "Spellbreaker", "Tempest", "Reaper"];
+const ProfessionColor = {"Warrior": "#FFD166", "Berserker": "#B39247", "Spellbreaker": "#665429", "Bladesworn": "#19150A", "Guardian": "#72C1D9", "Dragonhunter": "#508798", "Firebrand": "#2E4D57", "Willbender": "#0B1316", "Revenant": "#D16E5A", "Herald": "#924D3F", "Renegade": "#542C24", "Vindicator": "#2A1612", "Engineer": "#D09C59", "Scrapper": "#926D3E", "Holosmith": "#533E24", "Mechanist": "#2A1F12", "Ranger": "#8CDC82", "Druid": "#629A5B", "Soulbeast": "#385834", "Untamed": "#1C2C1A", "Thief": "#C08F95", "Daredevil": "#866468", "Deadeye": "#4D393C", "Specter": "#261D1E", "Elementalist": "#F68A87", "Tempest": "#AC615F", "Weaver": "#623736", "Catalyst": "#311C1B", "Mesmer": "#B679D5", "Chronomancer": "#7F5595", "Mirage": "#493055", "Virtuoso": "#24182B", "Necromancer": "#52A76F", "Reaper": "#39754E", "Scourge": "#21432C", "Harbinger": "#08110B"};
+const short_Prof = {"Guardian": "Gdn", "Dragonhunter": "Dgh",	"Firebrand": "Fbd",	"Willbender": "Wbd", "Warrior": "War", "Berserker": "Brs", "Spellbreaker": "Spb", "Bladesworn": "Bds", "Engineer": "Eng", "Scrapper": "Scr", "Holosmith": "Hls", "Mechanist": "Mec", "Ranger": "Rgr", "Druid": "Dru", "Soulbeast": "Slb", "Untamed": "Unt", "Thief": "Thf", "Daredevil": "Dar", "Deadeye": "Ded", "Specter": "Spe", "Elementalist": "Ele", "Tempest": "Tmp", "Weaver": "Wea", "Catalyst": "Cat", "Mesmer": "Mes", "Chronomancer": "Chr", "Mirage": "Mir", "Virtuoso": "Vir", "Necromancer": "Nec", "Reaper": "Rea", "Scourge": "Scg", "Harbinger": "Har", "Revenant": "Rev", "Herald": "Her", "Renegade": "Ren", "Vindicator": "Vin", "Unknown": "Ukn"};
+option = {
+  title: [
+    {text: 'Condition Cleanses Incoming per Second for all Fights Present', left: 'center'},
+    {text: 'Output in seconds across all fights \nupper: Q3 + 1.5 * IQR \nlower: Q1 - 1.5 * IQR', borderColor: '#999', borderWidth: 1, textStyle: {fontSize: 10}, left: '1%', top: '90%'}
+  ],
+dataset: [
+    {
+      // prettier-ignore
+      source: 
+[[0.0857, 0.0198, 0.373, 0.0864], [0.315], [0.4103], [0.1575, 0.6212], [0.1319, 0.4091, 0.4891], [0.1941, 0.8712], [0.2198, 0.5758, 0.3587], [0.3182, 0.0435, 0.0674, 0.2857, 0.0455, 0.0333, 0.0323, 0.0152, 0.0217, 0.038, 0.1176, 0.1538, 0.2066, 0.0141, 0.2429, 0.0693, 0.2857, 0.037], [0.2088, 0.2273, 0.0337, 0.0714, 0.0227, 0.0333, 0.0968, 0.0, 0.0435, 0.2532, 0.0353, 0.5538, 0.0331, 0.169, 0.0714, 0.0198, 0.1508, 0.0], [0.7571, 0.4851, 1.0238, 0.3333], [0.1941, 0.2652, 0.6087, 0.0, 0.0787, 0.1071, 0.0455, 0.1111, 0.0357, 0.0323, 0.1212, 0.1413, 0.1899, 0.1059, 0.2462, 0.0744, 0.0423, 0.4857, 0.0693, 0.1905, 0.1358], [0.1245, 0.3106, 0.6522, 0.0562, 0.1548, 0.0455, 0.0778, 0.2903, 0.3636, 0.1848, 0.2405, 0.4, 0.1846, 0.3471, 0.0141, 0.3571], [0.2051, 0.3712, 0.4674, 0.0, 0.1685, 0.0595, 0.0227, 0.2667, 0.0, 0.2258, 0.2576, 0.1522, 0.1519, 0.4353, 0.4308, 0.3636, 0.0704], [0.2088, 0.4242, 0.3804, 0.1538, 0.2584, 0.1667, 0.2222, 0.0357, 0.3548, 0.4022, 0.2152, 0.1412, 0.1385, 0.2231, 0.1268, 0.4143], [0.2308, 0.1304, 0.3708, 0.4048, 0.4318, 0.2333, 0.0714, 0.0323, 0.0606, 0.087, 0.1266, 0.2, 0.7077, 0.1157, 0.0986, 0.2, 0.0891, 0.4206, 0.0988], [0.1575, 0.5152, 0.2826, 0.236, 0.3214, 0.4318, 0.2333, 0.0, 0.2903, 0.2576, 0.25, 0.2405, 0.6, 0.2462, 0.4215], [0.1136, 0.447, 0.5326, 0.0385, 0.2697, 0.131, 0.0909, 0.0889, 0.0, 0.2258, 0.2424, 0.1957, 0.1392, 0.4235, 0.4308, 0.2975, 0.0423, 0.2857, 0.1089, 0.3492, 0.0741], [0.2344, 0.5455, 0.6848, 0.1573, 0.1786, 0.1364, 0.1556, 0.3226, 0.2121, 0.1522, 0.0759, 0.2941, 0.3846, 0.2975, 0.0141, 0.2857, 0.0792, 0.1825, 0.1728], [0.2821, 0.2955, 0.5652, 0.0385, 0.0562, 0.3452, 0.0909, 0.0444, 0.0357, 0.1613, 0.2576, 0.2717, 0.038, 0.3294, 0.2308, 0.1983, 0.0, 0.5714, 0.3663, 0.4206, 0.2222], [0.1538, 0.4621, 0.3587, 0.1348, 0.4881, 0.0227, 0.0889, 0.0645, 0.0455, 0.1957, 0.2785, 0.1176, 0.2923, 0.3388, 0.0423, 0.3857, 0.3168, 0.5794, 0.3827], [0.1758, 0.2348, 0.4783, 0.0, 0.1685, 0.5238, 0.0, 0.2, 0.0, 0.6129, 0.3636, 0.2717, 0.2278, 0.3059, 0.2615, 0.2314, 0.169, 0.4143, 0.1386, 0.4206, 0.1728], [0.1868, 0.1061, 0.5978, 0.1011, 0.2143, 0.1364, 0.3333, 0.0, 0.1613, 0.2273, 0.5326, 0.5316, 0.4588, 0.6308, 0.2231, 0.0986, 0.2286, 0.2079, 0.1984, 0.1852], [0.1465, 0.2348, 0.3043, 0.0787, 0.0833, 0.0682, 0.2444, 0.0357, 0.4516, 0.3333, 0.1522, 0.2532, 0.3765, 0.1692, 0.2727, 0.1972, 0.6286, 0.0693, 0.7619, 0.5309], [0.2088, 0.2197, 0.4348, 0.0, 0.0, 0.4048, 0.2727, 0.1444, 0.0, 0.3871, 0.0606, 0.0761, 0.2278, 0.4235, 0.8154, 0.2149, 0.2535, 0.2571, 0.4059, 0.5635, 0.1111], [0.4015, 0.1522, 0.0769, 0.0787, 0.3571, 0.1136, 0.2444, 0.0714, 0.4194, 0.197, 0.3478, 0.2785, 0.5882, 0.6154, 0.4298, 0.0986, 0.4571, 0.2277, 0.373, 0.3951], [0.2051, 0.2045, 0.75, 0.0, 0.0112, 0.2262, 0.3182, 0.4889, 0.0, 0.0323, 0.5455, 0.1848, 0.6329, 0.3647, 1.0308, 0.5785], [0.2879, 0.6739, 0.0385, 0.0952, 0.0682, 0.1444, 0.0, 0.3548, 0.2273, 0.3913, 0.4557, 0.6706, 0.2923, 0.3388, 0.0282, 0.3571, 0.2079, 0.8333, 0.2099], [0.1722, 0.2045, 0.4674, 0.0, 0.0, 0.4167, 0.1818, 0.1889, 0.0, 0.2258, 0.0909, 0.2609, 0.1139, 0.1176, 0.2923, 0.5041, 0.0423, 0.5714, 0.495, 0.7222, 0.284], [0.0769, 0.1011, 0.4286, 0.25, 0.3556, 0.0357, 0.2581, 0.4545, 0.2391, 0.3544, 0.6471, 0.4615, 0.4545, 0.0282, 0.5, 0.4356, 0.6587, 0.4691], [0.1461, 0.381, 0.7727, 0.4222, 0.2258, 0.5758, 0.4783, 0.4684, 0.4941, 0.5846, 0.3554, 0.1831, 0.4286, 0.4653, 0.4603, 0.284], [0.3587, 0.0, 0.1461, 0.3333, 0.25, 0.2556, 0.0714, 0.2903, 0.3939, 0.3696, 0.2785, 0.5294, 0.7077, 0.4215, 0.0845, 0.3714, 0.2871, 0.873, 0.3333], [0.2088, 0.1364, 0.6522, 0.1573, 0.4286, 0.2045, 0.2111, 0.0, 0.4516, 0.2121, 0.2717, 0.1646, 0.3765, 0.2154, 0.2149, 0.0, 0.5, 0.3762, 0.8095, 0.3457], [0.1429, 0.553, 0.1413, 0.2809, 0.4405, 0.0455, 0.3333, 0.0357, 0.2903, 0.3939, 0.2826, 0.2532, 0.5765, 0.3692, 0.3719, 0.0141, 0.1857, 0.3267, 0.746, 0.0617], [0.5606, 0.1196, 0.2247, 0.7381, 0.9318, 0.8444, 0.0, 0.2258, 0.5, 0.2391, 0.3924, 0.6, 0.7538, 0.5041, 0.1549, 0.6857], [0.1245, 0.6439, 0.7935, 0.1573, 0.2976, 0.0455, 0.1556, 0.5806, 0.6212, 0.0435, 0.3038, 0.5412, 0.3385, 0.2562, 0.0986, 0.5571, 0.4455, 0.627, 0.4444], [0.2894, 0.2955, 0.3043, 0.0, 0.3146, 0.0714, 0.2273, 0.3778, 0.0714, 0.2903, 0.7727, 0.4674, 0.4937, 0.6706, 0.6154, 0.3967, 0.1127, 0.5, 0.1881, 0.4524, 0.5926], [0.1832, 0.5758, 0.5109, 0.0385, 0.2697, 0.2381, 0.0455, 0.4111, 0.0, 0.4839, 0.4091, 0.3261, 0.3797, 0.6235, 0.4769, 0.3636, 0.0423, 0.6, 0.198, 0.6508, 0.5926], [0.3712, 0.5761, 0.0769, 0.2584, 0.4881, 0.5455, 0.3667, 0.1071, 0.4839, 0.4697, 0.5761, 0.519, 0.6941, 0.9231, 0.3554, 0.0423, 0.6143, 0.2376, 0.5714, 0.321], [0.2088, 0.3182, 0.8152, 0.0769, 0.2472, 0.0, 0.0909, 0.5222, 0.0714, 0.6452, 0.4091, 0.3587, 0.5696, 0.5765, 0.3077, 0.4711, 0.1831, 0.4, 0.3861, 0.8175, 0.5062], [0.1868, 0.7803, 0.8261, 0.0562, 0.8571, 0.5909, 0.2333, 0.0357, 0.4516, 0.6515, 0.5761, 0.4051, 0.3059, 0.3231, 0.314, 0.1127, 0.5286, 0.3762, 0.4206, 0.2469], [0.1575, 0.4545, 0.5652, 0.0, 0.2135, 0.0476, 0.25, 0.2222, 0.0357, 0.4839, 0.6667, 0.7174, 0.4051, 0.5176, 0.4, 0.3058, 0.0, 0.9857, 0.495, 1.2143, 0.0988], [0.2308, 0.5985, 0.413, 0.0, 0.2024, 0.3182, 0.5667, 0.0357, 0.2581, 0.4848, 0.7283, 0.6456, 0.6706, 0.8, 0.7355, 0.2254, 0.1857, 0.297, 0.373, 0.7531], [0.1795, 0.1061, 0.7717, 0.0, 0.2135, 0.8571, 0.5909, 0.3778, 0.0968, 0.4394, 0.3696, 0.3671, 0.6706, 0.6462, 0.562, 0.0282, 0.1429, 0.3069, 1.3492, 0.6173], [0.2967, 0.5303, 0.6413, 0.0, 0.2921, 0.5595, 0.0682, 0.2444, 0.0357, 0.7742, 0.2576, 0.337, 0.3291, 0.5647, 0.4923, 0.5041, 0.1972, 1.0429, 0.297, 0.8968, 0.4568], [0.3443, 0.697, 0.6413, 0.0, 0.2472, 0.3333, 0.3864, 0.3222, 0.0357, 0.4194, 0.5909, 0.25, 0.3797, 0.5529, 0.4769, 0.4711, 0.0141, 0.6714, 0.4257, 0.9048, 0.4198], [0.2015, 0.3712, 0.5543, 0.0385, 0.3596, 0.3929, 0.7273, 0.4889, 0.0, 0.5484, 0.7727, 0.0543, 0.3544, 0.9647, 0.5846, 0.3802, 0.0282, 0.7, 0.3663, 1.2619, 0.5309], [0.2015, 0.3864, 0.8913, 0.0674, 0.6071, 0.4545, 0.6889, 0.0, 0.5806, 0.1212, 0.2065, 0.481, 0.4235, 0.6154, 0.6612, 0.3803, 0.5857, 0.3861, 0.9683, 0.7654], [0.1978, 0.6667, 1.0217, 0.0385, 0.3034, 1.131, 0.2955, 0.5111, 0.0714, 0.7097, 0.6212, 0.6957, 0.6962, 1.1647, 1.0308, 0.5041, 0.1408, 1.4429, 0.6436, 1.381, 0.6173]]
+    },
+    {
+      transform: {
+        type: 'boxplot',
+        config: {
+          itemNameFormatter: function (params) {
+            return names[params.value]+" ("+short_Prof[professions[params.value]]+")";
+          }
+        }
+      },
+    },
+    {
+      fromDatasetIndex: 1,
+      fromTransformResult: 1
+    }
+  ],
+  dataZoom: [{type: 'slider', show: true, yAxisIndex: [0], start: 100, end: 50 },{type: 'inside', yAxisIndex: [0], start: 100, end: 50 },],
+  tooltip: {trigger: 'item'},
+  grid: {left: '25%', right: '10%', bottom: '15%'},
+  yAxis: {type: 'category', boundaryGap: true, nameGap: 30, splitArea: {show: true}, splitLine: {show: true}},
+  xAxis: {type: 'value', name: 'Sec', splitArea: {show: true}},
+  series: [
+    {
+      name: 'boxplot',
+      type: 'boxplot',
+      datasetIndex: 1,
+      tooltip: {trigger: 'item',
+          formatter: function (params) {
+            //console.log(params.value);
+          return `<u><b>${params.value[0]}</b></u>
+    <table>
+      <tr>
+      	<td align="right">&#x2022;</td>
+        <td align="left">Low   :</td>
+        <td style="color:blue;"align="right"><b>${params.value[1].toFixed(2)}</b></td>
+      </tr>
+      <tr>
+      	<td align="right">&#x2022;</td>
+        <td align="left">Q1    :</td>
+        <td style="color:blue;"align="right"><b>${params.value[2].toFixed(2)}</b></td>
+      </tr>
+      <tr>
+      	<td align="right">&#x2022;</td>
+        <td align="left">Q2    :</td>
+        <td style="color:blue;"align="right"><b>${params.value[3].toFixed(2)}</b></td>
+      </tr>
+      <tr>
+      	<td align="right">&#x2022;</td>
+        <td align="left">Q3    :</td>
+        <td style="color:blue;"align="right"><b>${params.value[4].toFixed(2)}</b></td>
+      </tr>
+      <tr>
+      	<td align="right">&#x2022;</td>
+        <td align="left">High  :</td>
+        <td style="color:blue;"align="right"><b>${params.value[5].toFixed(2)}</b></td>
+      </tr>  
+    </table>`;              
+        },    
+        axisPointer: {type: 'shadow'}},      
+      itemStyle: {
+        borderColor: function (seriesIndex) {
+          let myIndex = names.indexOf(seriesIndex.name.split(" (")[0]);
+          return ProfessionColor[professions[myIndex]];
+                },
+        borderWidth: 2
+      },
+      encode:{tooltip: [ 1, 2, 3, 4, 5]},
+      },
+    {
+      name: 'outlier',
+      type: 'scatter',
+      encode: { x: 1, y: 0 },
+      datasetIndex: 2,
+    }
+  ]
+};
+

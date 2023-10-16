@@ -1,0 +1,100 @@
+created: 20230524221126000
+creator: Drevarr
+modified: 20230705163531593
+modifier: drevarr
+tags: ChartData
+title: 202305242211_stability_ChartData
+type: text/vnd.tiddlywiki
+
+
+const names = ["Nocta Asthariel", "Mixon Cue Bringer", "Primo Pobre", "Newtype Khan", "Xanvias Einzbern", "Queen Josie", "Sire Nighthawk", "Baelin Fishbringer", "Duke Silvver", "Cael Saladbringer", "Pieca Pizzabringer", "Ryvalia Fazebringer", "Bubble Teabringer", "Soxx", "Blanco Padre Guard", "Sister Elon\u00edth", "Ravioli Ryebringer", "Bura Beignetbringer", "Bella Lunabringer"];
+const professions = ["Scourge", "Scrapper", "Firebrand", "Spellbreaker", "Berserker", "Willbender", "Vindicator", "Firebrand", "Vindicator", "Vindicator", "Firebrand", "Chronomancer", "Firebrand", "Firebrand", "Firebrand", "Firebrand", "Firebrand", "Firebrand", "Firebrand"];
+const ProfessionColor = {"Warrior": "#FFD166", "Berserker": "#B39247", "Spellbreaker": "#665429", "Bladesworn": "#19150A", "Guardian": "#72C1D9", "Dragonhunter": "#508798", "Firebrand": "#2E4D57", "Willbender": "#0B1316", "Revenant": "#D16E5A", "Herald": "#924D3F", "Renegade": "#542C24", "Vindicator": "#2A1612", "Engineer": "#D09C59", "Scrapper": "#926D3E", "Holosmith": "#533E24", "Mechanist": "#2A1F12", "Ranger": "#8CDC82", "Druid": "#629A5B", "Soulbeast": "#385834", "Untamed": "#1C2C1A", "Thief": "#C08F95", "Daredevil": "#866468", "Deadeye": "#4D393C", "Specter": "#261D1E", "Elementalist": "#F68A87", "Tempest": "#AC615F", "Weaver": "#623736", "Catalyst": "#311C1B", "Mesmer": "#B679D5", "Chronomancer": "#7F5595", "Mirage": "#493055", "Virtuoso": "#24182B", "Necromancer": "#52A76F", "Reaper": "#39754E", "Scourge": "#21432C", "Harbinger": "#08110B"};
+option = {
+  title: [
+    {text: 'Stability per Fight for all Fights Present', left: 'center'},
+    {text: 'Output in seconds across all fights \nupper: Q3 + 1.5 * IQR \nlower: Q1 - 1.5 * IQR', borderColor: '#999', borderWidth: 1, textStyle: {fontSize: 10}, left: '1%', top: '90%'}
+  ],
+dataset: [
+    {
+      // prettier-ignore
+      source: 
+[[5.6511, 0.0, 0.0, 1.6128, 5.4929, 2.7241, 0.0, 2.8548, 2.9215, 0.6768, 4.2806], [5.3282, 0.0, 0.0, 2.3616, 11.554, 1.8161, 2.9695, 0.0, 2.6579, 1.5651, 1.5792, 6.1534], [6.3563, 2.5507, 0.0, 3.6423, 5.7387, 2.3688, 15.5173], [8.8803, 0.0, 3.2832, 9.2811, 6.0968, 0.0, 0.0, 3.8392, 0.0, 0.0, 5.3508], [9.5261, 1.3673, 1.1281, 3.2256, 8.334, 3.243, 0.0, 0.0, 4.6267, 3.4432, 3.2148, 0.0], [10.4949, 0.0, 0.0, 3.168, 5.6823, 1.4269, 3.1217, 0.0, 3.7407, 8.2429, 2.82, 6.1534], [12.5828, 4.7588, 0.0, 10.9268, 2.6085, 8.0088, 8.5613], [7.5799, 15.651, 6.5988, 23.5435], [3.875, 0.0, 0.0, 5.7024, 13.2587, 3.1133, 2.3984, 0.0, 0.0, 5.217, 4.0044, 20.0655], [15.8231, 0.0, 0.0, 8.4096, 9.0917, 0.0, 0.0, 0.0, 6.2017, 5.7387, 4.3428, 18.9953], [19.8596, 0.0, 6.9696, 17.9014, 5.4821, 0.0, 8.269, 1.3564, 0.2256, 26.2189], [20.344, 0.0, 2.1991, 5.4144, 31.8209, 4.7996, 3.0837, 1.7136, 0.0, 0.0, 3.7788, 20.333], [20.9898, 0.0, 0.0, 10.0224, 31.0632, 14.1395, 6.0912, 0.0, 5.4142, 7.1995, 3.2712, 17.1226], [34.0681, 4.2341, 0.2856, 10.5408, 23.4868, 2.9836, 5.444, 0.0, 3.5438, 13.0425, 0.2256, 27.2891], [36.3285, 0.0, 0.0, 11.3472, 37.1244, 12.064, 8.4135, 0.1512, 24.8069, 18.0508, 8.9112, 37.7231], [43.5942, 13.7088, 39.3973, 18.2905, 7.043, 0.0, 17.4239, 21.8071, 6.5424, 40.131], [43.5942, 0.0, 1.4423, 15.264, 49.0572, 26.0737, 10.0505, 0.7056, 18.4083, 18.3638, 9.7572, 23.5435], [39.5577, 3.8474, 2.8417, 13.248, 43.3749, 28.279, 11.8398, 2.2932, 20.6724, 16.277, 12.1824, 48.4247], [48.438, 3.2439, 3.5272, 13.0176, 43.9431, 30.3545, 10.4693, 3.9564, 22.3459, 20.6593, 13.1412, 44.4116]]
+    },
+    {
+      transform: {
+        type: 'boxplot',
+        config: {
+          itemNameFormatter: function (params) {
+            return names[params.value];
+          }
+        }
+      },
+    },
+    {
+      fromDatasetIndex: 1,
+      fromTransformResult: 1
+    }
+  ],
+  dataZoom: [{type: 'slider', show: true, yAxisIndex: [0], start: 100, end: 50 },{type: 'inside', yAxisIndex: [0], start: 100, end: 50 },],
+  tooltip: {trigger: 'item'},
+  grid: {left: '20%', right: '10%', bottom: '15%'},
+  yAxis: {type: 'category', boundaryGap: true, nameGap: 30, splitArea: {show: true}, splitLine: {show: true}},
+  xAxis: {type: 'value', name: 'Sec', splitArea: {show: true}},
+  series: [
+    {
+      name: 'boxplot',
+      type: 'boxplot',
+      datasetIndex: 1,
+      tooltip: {trigger: 'item',
+          formatter: function (params) {
+            console.log(params.value);
+            //Low = params.value[1]
+          return `<u><b>${params.value[0]}</b></u>
+    <table>
+      <tr>
+      	<td align="right">&#x2022;</td>
+        <td align="left">Low   :</td>
+        <td style="color:blue;"align="right"><b>${params.value[1].toFixed(2)}</b></td>
+      </tr>
+      <tr>
+      	<td align="right">&#x2022;</td>
+        <td align="left">Q1    :</td>
+        <td style="color:blue;"align="right"><b>${params.value[2].toFixed(2)}</b></td>
+      </tr>
+      <tr>
+      	<td align="right">&#x2022;</td>
+        <td align="left">Q2    :</td>
+        <td style="color:blue;"align="right"><b>${params.value[3].toFixed(2)}</b></td>
+      </tr>
+      <tr>
+      	<td align="right">&#x2022;</td>
+        <td align="left">Q3    :</td>
+        <td style="color:blue;"align="right"><b>${params.value[4].toFixed(2)}</b></td>
+      </tr>
+      <tr>
+      	<td align="right">&#x2022;</td>
+        <td align="left">High  :</td>
+        <td style="color:blue;"align="right"><b>${params.value[5].toFixed(2)}</b></td>
+      </tr>  
+    </table>`;              
+        },    
+        axisPointer: {type: 'shadow'}},      
+      itemStyle: {
+        borderColor: function (seriesIndex) {
+          let myIndex = names.indexOf(seriesIndex.name);
+          return ProfessionColor[professions[myIndex]];
+                },
+        borderWidth: 2
+      },
+      encode:{tooltip: [ 1, 2, 3, 4, 5]},
+      },
+    {
+      name: 'outlier',
+      type: 'scatter',
+      encode: { x: 1, y: 0 },
+      datasetIndex: 2,
+    }
+  ]
+};
+

@@ -1,0 +1,100 @@
+created: 20230401222944000
+creator: Drevarr
+modified: 20230705163523934
+modifier: drevarr
+tags: ChartData
+title: 202304012229_dodges_ChartData
+type: text/vnd.tiddlywiki
+
+
+const names = ["Engine That Could", "Sanellek Knut", "Svess", "Charr Surethang", "Oo Dads Mad", "Lilyofthenight", "Madrigal Moonshade", "Redoxone", "Slingsshot", "Zadie Miststep", "Ateriuz", "High Sorcer Baradun", "Tac Mancer", "Bella Sassy", "Husky Guard", "Tribal S", "Miphest\u00f6", "Aronorf Xideliesi", "Lord Erin The Wise", "Your Arch Nemesis", "Cat Wigglebooty", "Rina Of Theros", "Tegan Parker", "Xanvias Tlesel", "Hyde En Sikh", "Drevarr Moonwillow", "Tootsie Pop Rocks", "Sygaldry Verdandi", "Einar X", "Astraea Lumena", "Be\u00eb", "Skye Nightroad", "Koralia Danai", "Mmathuss", "Venomina The Fierce", "Morv\u00e4rth", "Zenek Tryst", "Gabe Malhorn", "Newtype Khan", "Smol Gluvs", "Macette", "Aluin Ellesmera", "Johosh The Great", "Mistwalker Caelon"];
+const professions = ["Mechanist", "Druid", "Druid", "Berserker", "Spellbreaker", "Chronomancer", "Vindicator", "Soulbeast", "Untamed", "Tempest", "Berserker", "Tempest", "Scourge", "Firebrand", "Dragonhunter", "Druid", "Catalyst", "Firebrand", "Weaver", "Scrapper", "Scrapper", "Scourge", "Tempest", "Berserker", "Chronomancer", "Scrapper", "Scrapper", "Firebrand", "Vindicator", "Firebrand", "Scourge", "Scrapper", "Firebrand", "Firebrand", "Spellbreaker", "Scourge", "Weaver", "Firebrand", "Spellbreaker", "Scourge", "Chronomancer", "Tempest", "Firebrand", "Vindicator"];
+const ProfessionColor = {"Warrior": "#FFD166", "Berserker": "#B39247", "Spellbreaker": "#665429", "Bladesworn": "#19150A", "Guardian": "#72C1D9", "Dragonhunter": "#508798", "Firebrand": "#2E4D57", "Willbender": "#0B1316", "Revenant": "#D16E5A", "Herald": "#924D3F", "Renegade": "#542C24", "Vindicator": "#2A1612", "Engineer": "#D09C59", "Scrapper": "#926D3E", "Holosmith": "#533E24", "Mechanist": "#2A1F12", "Ranger": "#8CDC82", "Druid": "#629A5B", "Soulbeast": "#385834", "Untamed": "#1C2C1A", "Thief": "#C08F95", "Daredevil": "#866468", "Deadeye": "#4D393C", "Specter": "#261D1E", "Elementalist": "#F68A87", "Tempest": "#AC615F", "Weaver": "#623736", "Catalyst": "#311C1B", "Mesmer": "#B679D5", "Chronomancer": "#7F5595", "Mirage": "#493055", "Virtuoso": "#24182B", "Necromancer": "#52A76F", "Reaper": "#39754E", "Scourge": "#21432C", "Harbinger": "#08110B"};
+option = {
+  title: [
+    {text: 'Dodge Attempts per Fight for all Fights Present', left: 'center'},
+    {text: 'Output in seconds across all fights \nupper: Q3 + 1.5 * IQR \nlower: Q1 - 1.5 * IQR', borderColor: '#999', borderWidth: 1, textStyle: {fontSize: 10}, left: '1%', top: '90%'}
+  ],
+dataset: [
+    {
+      // prettier-ignore
+      source: 
+[[4, 1, 2, 2, 4, 5, 11], [1, 2, 1, 3, 0, 14, 2, 0, 3, 0, 1, 0, 1, 3], [2, 1, 4, 1, 22, 2, 0, 0, 0, 1, 0, 5, 4], [0, 7, 1, 4, 0, 1, 1, 2, 0, 4, 2, 2, 1, 0, 1, 0, 0, 0, 0, 8, 0, 3, 0, 1, 1, 1, 3], [8, 9, 2, 13, 1, 1, 0, 2, 0, 6, 1, 4, 3], [4, 8, 2, 15, 3, 9, 2, 1, 1, 6], [4, 9, 3, 18, 1, 6, 3, 0, 0, 4, 2, 6, 0], [2, 7, 2, 5, 2, 7, 1, 4, 7, 4, 3, 2, 5, 4, 1], [4, 6, 2, 14, 1, 8, 3, 1, 2, 0, 3, 1, 5, 1, 2, 1, 4, 0], [7, 12, 3, 6, 2, 2, 1, 0, 0, 1, 1, 0, 0, 3, 2, 1, 0, 2, 0, 0, 1, 13, 1, 1, 2, 0, 0, 1, 2], [1, 0, 3, 5, 4, 6, 0, 0, 1, 5, 1, 7, 0, 23, 2, 0, 1, 0, 0, 1, 1, 3], [0, 6, 1, 7, 1, 0, 1, 0, 3, 4, 1, 3, 2, 3, 1, 5, 0, 0, 1, 21, 0, 1, 0, 0, 1, 1, 2, 0], [7, 9, 3, 10, 1, 1, 0, 7, 1, 6, 0, 10, 2, 1, 1, 0, 0, 4, 2], [4, 6, 0, 9, 1, 3, 1, 1, 1, 0, 1, 4, 1, 2, 1, 1, 2, 4, 0, 2, 0, 15, 2, 1, 1, 0, 0, 1, 0, 6], [2, 7, 1, 2, 2, 8, 4, 1, 0, 10, 0, 0, 0, 10, 0, 6, 1, 20], [5, 7, 4, 10, 2, 5, 1, 3, 1, 2, 5, 0, 6, 0, 1, 0, 2, 0, 2, 0, 15, 1, 0, 2, 1, 0, 1, 2, 0], [3, 17, 2, 2, 0, 2, 7, 7, 3, 4, 2, 1, 2, 7, 2, 17, 2], [2, 2, 0, 1, 0, 5, 0, 8, 4, 1, 0, 4, 0, 8, 1, 29, 2, 1, 4, 1, 0, 1, 6, 3], [7, 12, 7, 24, 0, 7, 3, 1, 2, 7, 3, 2, 3, 7, 0], [3, 12, 4, 11, 1, 1, 2, 4, 1, 0, 0, 3, 3, 1, 2, 3, 7, 0, 5, 0, 10, 2, 1, 1, 0, 0, 3, 3, 2], [2, 7, 2, 3, 0, 5, 0, 5, 3, 9, 1, 0, 3, 4, 4, 0, 22, 0, 0, 4, 1, 1, 2, 5, 2], [4, 4, 2, 13, 1, 7, 0, 2, 0, 2, 4, 2, 1, 6, 2, 2, 0, 2, 1, 4, 3, 16, 2, 1, 2, 1, 1, 3, 3, 3], [1, 7, 1, 2, 2, 0, 3, 2, 6, 2, 2, 1, 12, 0, 7, 2, 24, 1, 2, 6, 2, 1, 2, 6, 1], [6, 9, 3, 14, 2, 3, 0, 0, 0, 2, 3, 3, 1, 6, 1, 1, 1, 5, 0, 1, 1, 24, 0, 0, 0, 1, 0, 3, 3, 3], [1, 3, 2, 18, 2, 5, 1, 2, 0, 2, 3, 5, 0, 6, 2, 0, 1, 8, 0, 3, 0, 23, 1, 3, 2, 0, 1, 0, 4, 2], [7, 6, 4, 16, 2, 7, 1, 1, 0, 1, 5, 4, 2, 5, 1, 0, 2, 3, 4, 1, 22, 0, 1, 1, 0, 1, 2, 2, 1], [8, 9, 4, 11, 1, 6, 2, 0, 1, 3, 0, 0, 3, 6, 2, 4, 2, 7, 1, 3, 0, 13, 4, 4, 2, 0, 2, 2, 4], [6, 0, 1, 15, 2, 6, 1, 5, 0, 4, 2, 4, 3, 5, 3, 1, 2, 3, 0, 9, 0, 22, 0, 2, 5, 0, 2, 0, 2, 0], [2, 9, 2, 7, 0, 8, 1, 3, 1, 8, 0, 0, 0, 2, 0, 7, 0, 36, 0, 8, 0, 0, 0, 7, 6], [7, 11, 5, 10, 1, 4, 3, 1, 3, 5, 2, 1, 5, 4, 1, 2, 1, 7, 4, 0, 21, 1, 0, 4, 2, 0, 2, 7], [4, 9, 4, 16, 2, 7, 0, 2, 0, 3, 5, 6, 2, 7, 0, 0, 1, 4, 0, 6, 0, 21, 3, 1, 4, 0, 1, 2, 2, 4], [4, 12, 3, 16, 1, 8, 4, 5, 0, 2, 0, 0, 3, 9, 1, 1, 3, 7, 0, 4, 0, 23, 1, 0, 4, 1, 0, 2, 5, 3], [6, 13, 4, 10, 3, 4, 1, 3, 1, 6, 4, 5, 2, 9, 1, 1, 4, 6, 0, 5, 1, 20, 2, 2, 4, 0, 0, 3, 1, 3], [2, 3, 3, 16, 2, 11, 5, 53, 4, 5, 8, 2, 3, 4, 7, 9], [5, 8, 2, 21, 2, 9, 2, 4, 0, 11, 1, 2, 10, 2, 1, 2, 9, 0, 6, 0, 28, 1, 3, 2, 0, 2, 2, 5], [10, 13, 5, 26, 0, 5, 4, 2, 1, 3, 0, 2, 4, 4, 2, 3, 0, 7, 0, 9, 2, 32, 1, 0, 3, 1, 2, 3, 7, 4], [10, 11, 6, 27, 1, 9, 2, 4, 0, 4, 3, 3, 4, 7, 0, 1, 1, 6, 0, 8, 2, 33, 3, 1, 3, 0, 1, 5, 7, 6], [16, 15, 4, 20, 3, 10, 6, 4, 3, 4, 0, 2, 5, 13, 3, 4, 4, 12, 2, 10, 1, 25, 5, 1, 3, 4, 2, 4, 8, 6], [19, 20, 9, 18, 1, 10, 5, 7, 4, 8, 0, 7, 11, 1, 1, 5, 15, 0, 9, 3, 47], [16, 19, 6, 25, 3, 3, 4, 4, 2, 8, 4, 7, 7, 5, 3, 3, 4, 11, 0, 6, 1, 31, 5, 2, 4, 3, 2, 4, 5, 8], [18, 17, 6, 27, 4, 8, 2, 6, 1, 10, 2, 7, 7, 11, 1, 2, 3, 10, 1, 9, 1, 38, 4, 2, 3, 4, 2, 3, 7, 8], [9, 19, 6, 18, 4, 14, 5, 8, 3, 8, 4, 3, 3, 11, 3, 4, 3, 15, 2, 10, 6, 32, 4, 4, 6, 4, 2, 6, 9, 8], [10, 23, 8, 27, 4, 13, 4, 7, 1, 11, 4, 6, 8, 11, 4, 4, 3, 12, 10, 0, 49, 2, 2, 5, 2, 2, 2, 5, 6], [16, 34, 12, 30, 2, 9, 7, 1, 6, 5, 8, 5, 5, 0, 1, 3, 9, 1, 10, 2, 51, 7, 1, 8, 3, 0, 4, 5, 7]]
+    },
+    {
+      transform: {
+        type: 'boxplot',
+        config: {
+          itemNameFormatter: function (params) {
+            return names[params.value];
+          }
+        }
+      },
+    },
+    {
+      fromDatasetIndex: 1,
+      fromTransformResult: 1
+    }
+  ],
+  dataZoom: [{id: 'dataZoomX', type: 'slider', xAxisIndex: [0], left: 10, height: 10, filterMode: 'empty', start: 0, end: 100},{id: 'dataZoomY', type: 'slider', yAxisIndex: [0], filterMode: 'empty', start: 0, end: 100}],
+  tooltip: {trigger: 'item'},
+  grid: {left: '20%', right: '10%', bottom: '15%'},
+  yAxis: {type: 'category', boundaryGap: true, nameGap: 30, splitArea: {show: true}, splitLine: {show: true}},
+  xAxis: {type: 'value', name: 'Sec', splitArea: {show: true}},
+  series: [
+    {
+      name: 'boxplot',
+      type: 'boxplot',
+      datasetIndex: 1,
+      tooltip: {trigger: 'item',
+          formatter: function (params) {
+            console.log(params.value);
+            //Low = params.value[1]
+          return `<u><b>${params.value[0]}</b></u>
+    <table>
+      <tr>
+      	<td align="right">&#x2022;</td>
+        <td align="left">Low   :</td>
+        <td style="color:blue;"align="right"><b>${params.value[1].toFixed(2)}</b></td>
+      </tr>
+      <tr>
+      	<td align="right">&#x2022;</td>
+        <td align="left">Q1    :</td>
+        <td style="color:blue;"align="right"><b>${params.value[2].toFixed(2)}</b></td>
+      </tr>
+      <tr>
+      	<td align="right">&#x2022;</td>
+        <td align="left">Q2    :</td>
+        <td style="color:blue;"align="right"><b>${params.value[3].toFixed(2)}</b></td>
+      </tr>
+      <tr>
+      	<td align="right">&#x2022;</td>
+        <td align="left">Q3    :</td>
+        <td style="color:blue;"align="right"><b>${params.value[4].toFixed(2)}</b></td>
+      </tr>
+      <tr>
+      	<td align="right">&#x2022;</td>
+        <td align="left">High  :</td>
+        <td style="color:blue;"align="right"><b>${params.value[5].toFixed(2)}</b></td>
+      </tr>  
+    </table>`;              
+        },    
+        axisPointer: {type: 'shadow'}},      
+      itemStyle: {
+        borderColor: function (seriesIndex) {
+          let myIndex = names.indexOf(seriesIndex.name);
+          return ProfessionColor[professions[myIndex]];
+                },
+        borderWidth: 2
+      },
+      encode:{tooltip: [ 1, 2, 3, 4, 5]},
+      },
+    {
+      name: 'outlier',
+      type: 'scatter',
+      encode: { x: 1, y: 0 },
+      datasetIndex: 2,
+    }
+  ]
+};
+
